@@ -378,7 +378,7 @@ AudioHardwareALSA::AudioHardwareALSA() :
     mALSADevice->setFlags(mDevSettingsFlag);
 
     //set default AudioParameters for surround sound recording
-    char ssr_enabled[6] = "false";
+    char ssr_enabled[PROP_VALUE_MAX] = "false";
     property_get("ro.qc.sdk.audio.ssr",ssr_enabled,"0");
     if (!strncmp("true", ssr_enabled, 4)) {
         ALOGD("surround sound recording is supported");

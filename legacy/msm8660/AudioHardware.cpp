@@ -139,6 +139,27 @@ static uint32_t SND_DEVICE_VR_HEADSET                 = 71;
 static uint32_t SND_DEVICE_HAC                        = 252;
 static uint32_t SND_DEVICE_USB_HEADSET                = 253;
 #endif
+#ifdef PRESTO_AUDIO
+static uint32_t SND_DEVICE_NR_OFF_CT                  = 24;
+static uint32_t SND_DEVICE_NR_OFF_FT                  = 25;
+static uint32_t SND_DEVICE_NR_CT                      = 21;
+static uint32_t SND_DEVICE_NR_FT                      = 22;
+static uint32_t DEVICE_SND_DEVICE_NR_CT_RX            = 20;  // Close talk TX^M
+static uint32_t DEVICE_SND_DEVICE_NR_CT_TX            = 21;  // Close talk RX^M
+static uint32_t DEVICE_SND_DEVICE_NR_FT_RX            = 22;  // Far talk(speaker phone) TX^M
+static uint32_t DEVICE_SND_DEVICE_NR_FT_TX            = 23;  // Far talk(speaker phone) RX^M
+static uint32_t DEVICE_SND_DEVICE_NR_DV_RX            = 24;  // desk talk(speaker phone) TX^M
+static uint32_t DEVICE_SND_DEVICE_NR_DV_TX            = 25;  // desk talk(speaker phone) RX^M
+static uint32_t DEVICE_SND_DEVICE_NR_OFF_CT_RX        = 26;  // Close talk TX^M
+static uint32_t DEVICE_SND_DEVICE_NR_OFF_CT_TX        = 27;  // Close talk RX^M
+static uint32_t DEVICE_SND_DEVICE_NR_OFF_FT_RX        = 28;  // Far talk(speaker phone) TX^M
+static uint32_t DEVICE_SND_DEVICE_NR_OFF_FT_TX        = 29;  // Far talk(speaker phone) RX^M
+static uint32_t DEVICE_SND_DEVICE_NR_OFF_DV_RX        = 30;  // desk TX^M
+static uint32_t DEVICE_SND_DEVICE_NR_OFF_DV_TX        = 31;  // desk RX^M
+static uint32_t DEVICE_SND_DEVICE_NR_ON_2MIC_TX	      = 32;
+static uint32_t DEVICE_SND_DEVICE_NR_OFF_CT_1MIC_RX   = 62;  // nr_off_ct_1mic_rx
+static uint32_t DEVICE_SND_DEVICE_NR_OFF_CT_1MIC_TX   = 63;  // nr_off_ct_1mic_rx
+#endif // PRESTO_AUDIO
 static const uint32_t DEVICE_HANDSET_RX            = 0; // handset_rx
 static const uint32_t DEVICE_HANDSET_TX            = 1;//handset_tx
 static const uint32_t DEVICE_SPEAKER_RX            = 2; //speaker_stereo_rx
@@ -889,6 +910,38 @@ AudioHardware::AudioHardware() :
             else if(strcmp((char* )name[i], "headset_vr_tx") == 0)
                 index = DEVICE_HEADSET_VR_TX;
 #endif
+#ifdef PRESTO_AUDIO
+        else if(strcmp((char* )name[i], "nr_off_ct_rx") == 0)
+                index = DEVICE_SND_DEVICE_NR_OFF_CT_RX;
+            else if(strcmp((char* )name[i], "nr_off_ct_tx") == 0)
+                index = DEVICE_SND_DEVICE_NR_OFF_CT_TX;
+            else if(strcmp((char* )name[i], "nr_off_ft_rx") == 0)
+                index = DEVICE_SND_DEVICE_NR_OFF_FT_RX;
+            else if(strcmp((char* )name[i], "nr_off_ft_tx") == 0)
+                index = DEVICE_SND_DEVICE_NR_OFF_FT_TX;
+            else if(strcmp((char* )name[i], "nr_off_dv_rx") == 0)
+                index = DEVICE_SND_DEVICE_NR_OFF_DV_RX;
+            else if(strcmp((char* )name[i], "nr_off_dv_tx") == 0)
+                index = DEVICE_SND_DEVICE_NR_OFF_DV_TX;
+        else if(strcmp((char* )name[i], "nr_ct_rx") == 0)
+                index = DEVICE_SND_DEVICE_NR_CT_RX;
+            else if(strcmp((char* )name[i], "nr_ct_tx") == 0)
+                index = DEVICE_SND_DEVICE_NR_CT_TX;
+            else if(strcmp((char* )name[i], "nr_ft_rx") == 0)
+                index = DEVICE_SND_DEVICE_NR_FT_RX;
+            else if(strcmp((char* )name[i], "nr_ft_tx") == 0)
+                index = DEVICE_SND_DEVICE_NR_FT_TX;
+            else if(strcmp((char* )name[i], "nr_dv_rx") == 0)
+                index = DEVICE_SND_DEVICE_NR_DV_RX;
+            else if(strcmp((char* )name[i], "nr_dv_tx") == 0)
+                index = DEVICE_SND_DEVICE_NR_DV_TX;
+            else if(strcmp((char* )name[i], "nr_ct_2mic_tx") == 0)
+                index = DEVICE_SND_DEVICE_NR_ON_2MIC_TX;
+            else if(strcmp((char* )name[i], "nr_off_ct_1mic_rx") == 0)
+                index = DEVICE_SND_DEVICE_NR_OFF_CT_1MIC_RX;
+            else if(strcmp((char* )name[i], "nr_off_ct_1mic_tx") == 0)
+                index = DEVICE_SND_DEVICE_NR_OFF_CT_1MIC_TX;
+#endif // PRESTO_AUDIO
             else if((strcmp((char* )name[i], "camcoder_tx") == 0) ||
 #ifdef SONY_AUDIO
                     (strcmp((char* )name[i], "secondary_mic_tx") == 0))
@@ -1974,6 +2027,44 @@ static status_t do_route_audio_rpc(uint32_t device,
         ALOGV("In FM HEADSET");
     }
 #endif
+#ifdef PRESTO_AUDIO
+    else if(device == SND_DEVICE_NR_OFF_CT) {
+        new_rx_device = DEVICE_SND_DEVICE_NR_OFF_CT_RX;
+        new_tx_device = DEVICE_SND_DEVICE_NR_OFF_CT_TX;
+        ALOGI("In SND_DEVICE_NR_OFF_CT");
+        if(DEV_ID(new_tx_device) == INVALID_DEVICE) {
+            new_tx_device = DEVICE_SND_DEVICE_NR_ON_2MIC_TX;
+            ALOGI("Falling back to HANDSET_CALL_RX AND HANDSET_CALL_TX as no DUALMIC_HANDSET_TX support found");
+        }
+    }
+    else if(device == SND_DEVICE_NR_CT) {
+        new_rx_device = DEVICE_SND_DEVICE_NR_CT_RX;
+        new_tx_device = DEVICE_SND_DEVICE_NR_CT_TX;
+        ALOGI("In SND_DEVICE_NR_CT");
+        if(DEV_ID(new_tx_device) == INVALID_DEVICE) {
+            new_tx_device = DEVICE_SND_DEVICE_NR_ON_2MIC_TX;
+            ALOGI("Falling back to HANDSET_CALL_RX AND HANDSET_CALL_TX as no DUALMIC_HANDSET_TX support found");
+        }
+    }
+    else if(device == SND_DEVICE_NR_FT) {
+        new_rx_device = DEVICE_SND_DEVICE_NR_FT_RX;
+        new_tx_device = DEVICE_SND_DEVICE_NR_FT_TX;
+        ALOGI("In SND_DEVICE_NR_FT");
+        if(DEV_ID(new_tx_device) == INVALID_DEVICE) {
+            new_tx_device = DEVICE_SND_DEVICE_NR_ON_2MIC_TX;
+            ALOGI("Falling back to HANDSET_CALL_RX AND HANDSET_CALL_TX as no DUALMIC_HANDSET_TX support found");
+        }
+    }
+    else if(device == SND_DEVICE_NR_OFF_FT) {
+        new_rx_device = DEVICE_SND_DEVICE_NR_OFF_FT_RX;
+        new_tx_device = DEVICE_SND_DEVICE_NR_OFF_FT_TX;
+        ALOGI("In SND_DEVICE_NR_OFF_FT");
+        if(DEV_ID(new_tx_device) == INVALID_DEVICE) {
+            new_tx_device = DEVICE_SND_DEVICE_NR_ON_2MIC_TX;
+            ALOGI("Falling back to HANDSET_CALL_RX AND HANDSET_CALL_TX as no DUALMIC_HANDSET_TX support found");
+        }
+    }
+#endif // PRESTO_AUDIO
 #ifdef SAMSUNG_AUDIO
     else if(device == SND_DEVICE_IN_S_SADC_OUT_HANDSET) {
         new_rx_device = DEVICE_HANDSET_CALL_RX;
@@ -2788,6 +2879,16 @@ status_t AudioHardware::doRouting(AudioStreamInMSM8x60 *input, uint32_t outputDe
 
 #ifndef SAMSUNG_AUDIO
     if (dualmic_enabled) {
+#ifdef PRESTO_AUDIO
+        if (sndDevice == SND_DEVICE_HANDSET) {
+            ALOGI("Routing audio to Handset with DualMike enabled\n");
+            sndDevice = SND_DEVICE_NR_CT;
+        }
+        if (sndDevice == SND_DEVICE_SPEAKER) {
+            ALOGI("Routing audio to Handset with DualMike enabled\n");
+            sndDevice = SND_DEVICE_NR_FT;
+        }
+#else // PRESTO_AUDIO
         if (sndDevice == SND_DEVICE_HANDSET) {
             ALOGI("Routing audio to Handset with DualMike enabled\n");
             sndDevice = SND_DEVICE_IN_S_SADC_OUT_HANDSET;
@@ -2795,6 +2896,7 @@ status_t AudioHardware::doRouting(AudioStreamInMSM8x60 *input, uint32_t outputDe
             ALOGI("Routing audio to Speakerphone with DualMike enabled\n");
             sndDevice = SND_DEVICE_IN_S_SADC_OUT_SPEAKER_PHONE;
         }
+#endif // PRESTO_AUDIO
     }
 #endif
 
@@ -2809,6 +2911,18 @@ status_t AudioHardware::doRouting(AudioStreamInMSM8x60 *input, uint32_t outputDe
 #endif
     }
 #endif
+#ifdef PRESTO_AUDIO
+    if (mMode == AudioSystem::MODE_IN_CALL) {
+        if ((!dualmic_enabled) && (sndDevice == SND_DEVICE_HANDSET)) {
+            ALOGD("Routing audio to Call Handset\n");
+            sndDevice = SND_DEVICE_NR_OFF_CT;
+        } 
+    if ((!dualmic_enabled) && (sndDevice == SND_DEVICE_SPEAKER)) {
+            ALOGD("Routing audio to Call Handset\n");
+            sndDevice = SND_DEVICE_NR_OFF_FT;
+        }
+    }
+#endif // PRESTO_AUDIO
 
 #ifdef QCOM_FM_ENABLED
     if ((outputDevices & AUDIO_DEVICE_OUT_FM) && (mFmFd == -1)){

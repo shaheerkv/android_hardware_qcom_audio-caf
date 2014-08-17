@@ -35,6 +35,10 @@ ifeq ($(BOARD_HAVE_SONY_AUDIO),true)
   common_cflags += -DSONY_AUDIO
 endif
 
+ifeq ($(BOARD_HAVE_PRESTO_AUDIO),true)
+  common_cflags += -DPRESTO_AUDIO
+endif
+
 ifeq ($(BOARD_HAVE_BACK_MIC_CAMCORDER),true)
   common_cflags += -DBACK_MIC_CAMCORDER
 endif
